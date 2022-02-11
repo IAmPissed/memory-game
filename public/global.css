@@ -16,4 +16,12 @@ body {
 
 body {
 	font-family: "Raleway", sans-serif;
+	background-color: hsl(266, 25%, 11%);
+	color: white;
+	text-align: center;
+	font-size: 62.5%;
+}
+main {
+	width: min(100%, 86rem);
+	margin: 4rem auto;
 }

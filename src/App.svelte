@@ -1,15 +1,19 @@
 <script>
 	import SingleCard from "./components/SingleCard.svelte";
 
-	const cardImages = [
-		{ src: "/img/helmet-1.png" },
-		{ src: "/img/potion-1.png" },
-		{ src: "/img/ring-1.png" },
-		{ src: "/img/scroll-1.png" },
-		{ src: "/img/shield-1.png" },
-		{ src: "/img/sword-1.png" },
-	];
+	let disabled = false;
 	$: turns = 0;
+	let choiceOne = null;
+	let choiceTwo = null;
+
+	const cardImages = [
+		{ src: "/img/helmet-1.png", matched: false },
+		{ src: "/img/potion-1.png", matched: false },
+		{ src: "/img/ring-1.png", matched: false },
+		{ src: "/img/scroll-1.png", matched: false },
+		{ src: "/img/shield-1.png", matched: false },
+		{ src: "/img/sword-1.png", matched: false },
+	];
 
 	function shuffle(arr) {
 		let i = arr.length,
@@ -25,6 +29,13 @@
 		return newArr;
 	}
 
+	const resetTurn = () => {
+		choiceOne = null;
+		choiceTwo = null;
+		turns = turns + 1;
+		disabled = false;
+	};
+
 	// Shuffle Cards
 	let cards = [];
 	const shuffleCards = () => {
@@ -33,8 +44,29 @@
 		);
 		turns = 0;
 		cards = shuffledCards;
+		choiceOne = null;
+		choiceTwo = null;
 	};
 	shuffleCards();
+
+	const handleChoice = (card) => {
+		choiceOne ? (choiceTwo = card) : (choiceOne = card);
+		if (choiceOne && choiceTwo) {
+			disabled = true;
+			if (choiceOne.src === choiceTwo.src) {
+				cards = cards.map((card) => {
+					if (card.src === choiceOne.src) {
+						return { ...card, matched: true };
+					} else {
+						return card;
+					}
+				});
+				resetTurn();
+			} else {
+				setTimeout(() => resetTurn(), 1500);
+			}
+		}
+	};
 </script>
 
 <main>
@@ -43,9 +75,15 @@
 		<button on:click={shuffleCards}>New Game</button>
 		<div class="card-grid">
 			{#each cards as card (card.id)}
-				<SingleCard {card} />
+				<SingleCard
+					{card}
+					{handleChoice}
+					flipped={card === choiceOne || card === choiceTwo || card.matched}
+					{disabled}
+				/>
 			{/each}
 		</div>
+		<p>Turns: {turns}</p>
 	</div>
 </main>
 
@@ -69,9 +107,13 @@
 	}
 	.card-grid {
 		margin-top: 4rem;
+		margin-bottom: 2rem;
 		display: grid;
 		grid-template-columns: repeat(4, 10rem);
 		gap: 2rem;
 		justify-content: center;
+	}
+	p {
+		font-size: 1.6rem;
 	}
 </style>

@@ -1,11 +1,13 @@
 <script>
+	import SingleCard from "./components/SingleCard.svelte";
+
 	const cardImages = [
-		{ src: "/public/img/helmet-1.png" },
-		{ src: "/public/img/potion-1.png" },
-		{ src: "/public/img/ring-1.png" },
-		{ src: "/public/img/scroll-1.png" },
-		{ src: "/public/img/shield-1.png" },
-		{ src: "/public/img/sword-1.png" },
+		{ src: "/img/helmet-1.png" },
+		{ src: "/img/potion-1.png" },
+		{ src: "/img/ring-1.png" },
+		{ src: "/img/scroll-1.png" },
+		{ src: "/img/shield-1.png" },
+		{ src: "/img/sword-1.png" },
 	];
 	$: turns = 0;
 
@@ -24,18 +26,27 @@
 	}
 
 	// Shuffle Cards
+	let cards = [];
 	const shuffleCards = () => {
 		const shuffledCards = shuffle([...cardImages, ...cardImages]).map(
 			(card) => ({ ...card, id: Math.random() })
 		);
-
 		turns = 0;
+		cards = shuffledCards;
 	};
+	shuffleCards();
 </script>
 
 <main>
-	<h1>Magic Match</h1>
-	<button on:click={shuffleCards}>New Game</button>
+	<div class="container">
+		<h1>Magic Match</h1>
+		<button on:click={shuffleCards}>New Game</button>
+		<div class="card-grid">
+			{#each cards as card (card.id)}
+				<SingleCard {card} />
+			{/each}
+		</div>
+	</div>
 </main>
 
 <style>
@@ -55,5 +66,12 @@
 	button:hover {
 		background: hsl(340, 55%, 49%);
 		color: white;
+	}
+	.card-grid {
+		margin-top: 4rem;
+		display: grid;
+		grid-template-columns: repeat(4, 10rem);
+		gap: 2rem;
+		justify-content: center;
 	}
 </style>
